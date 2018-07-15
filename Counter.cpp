@@ -295,16 +295,24 @@ void Counter::threadCounter1(const int &limit)
 void Counter::threadCounter2(const int &limit)
 {
 	int radius = 0;
+	std::list<std::thread>::iterator iterThreads;
 
 	do {
 		radius++;
 
-		if (VersionScoreThreaded == false)
+		if (VersionScoreThreaded == false) {
 			threadCounter22(radius, limit);
-		else
+		} else
 			_threads22.push_back(std::thread ([this, radius, limit] { return this->threadCounter22(std::ref(radius), limit); }));
 		
-	} while (!(radius - limit > 0));
+	} while (
+		//!(radius - limit > 0) 
+		_busy > 0
+		);
+
+	if (VersionScoreThreaded == true) {
+		iterThreads = _threads22.begin();
+	}
 
 	std::cout << "\nCounter::thread(ver.2) stopped...";
 }
@@ -325,7 +333,8 @@ int Counter::maxPassed(const int &radius) const
 */
 void Counter::threadCounter22(const int & radius, const int &limit)
 {
-	int iPass = 0
+	int iRes = 0 // кол-во успешных проверок
+		, iPass = 0
 		, maxPass = maxPassed(radius);
 	Position::Direct curDirect = _vecPossible[0];
 	Position centrePosition
@@ -358,6 +367,7 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 
 				if (isSuccess(curPosition, limit) == true) {
 					_setBusy.insert(std::auto_ptr<Position>(new Position(curPosition)));
+					iRes++;
 
 					if (SuccessPrinted == true)
 						std::cout << "\nPlay to:" + SSTR(curDirect) + "\n" + curPosition.Print() + "\nOk\n";
@@ -399,7 +409,7 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 		}
 	}
 
-	message = "radius= " + std::to_string(radius) + "(passed <" + std::to_string(iPass) + ":" + std::to_string(maxPass) + ">), limit = " + std::to_string(limit) + "; stopped...";
+	message = "radius= " + std::to_string(radius) + "(passed <" + std::to_string(iPass) + ":" + std::to_string(maxPass) + ">, success=" + std::to_string(iRes) + "), limit = " + std::to_string(limit) + "; stopped...";
 	if (VersionScoreThreaded == false)
 		std::cout << "\nCounter: " << message;
 	else {
@@ -407,6 +417,8 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 		std::cout << "\nCounter(ver.2): " << message;
 		_mtx22.unlock();
 	}
+
+	_busy = iRes;
 }
 
 /* Остановить поток */

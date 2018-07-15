@@ -26,6 +26,9 @@ private:
 	/* Контейнер для ячеек, удовлетвряющих условиям ограничений */
 	std::set<std::auto_ptr<Position>> _setBusy;
 
+	/* Признак завершения алгоритма SCORE(2) */
+	int _busy;
+
 	std::thread _thread;
 	std::list<std::thread> _threads22;
 	std::recursive_mutex _mtx22;

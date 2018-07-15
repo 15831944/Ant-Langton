@@ -163,7 +163,18 @@ Arg::~Arg()
 		;
 }
 
-std::string Arg::Print() { return _position->Print() + ";\nLimit = " + SSTR(_limit); }
+std::string Arg::toBoolean(const int &value)
+{
+	return value == 1 ? "true" : "false";
+}
+
+std::string Arg::Print()
+{
+	return _position->Print()
+		+ ";\nLimit = " + SSTR(_limit)
+		+ ";\nmessages = <success=" + toBoolean(_successPrinted) + ":fail=" + toBoolean(_failPrinted) + ">"
+		+ ";\nver_score_thread = " + toBoolean(_versionScoreThreaded);
+}
 
 /* Прервать выполнение при ошибке
  * value - значение, которое не удалось распознать
