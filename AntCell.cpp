@@ -1,4 +1,4 @@
-// AntCell.cpp: определяет точку входа для консольного приложения.
+п»ї// AntCell.cpp: РѕРїСЂРµРґРµР»СЏРµС‚ С‚РѕС‡РєСѓ РІС…РѕРґР° РґР»СЏ РєРѕРЅСЃРѕР»СЊРЅРѕРіРѕ РїСЂРёР»РѕР¶РµРЅРёСЏ.
 //
 
 #include "stdafx.h"
@@ -34,7 +34,7 @@ int main(int argc, char* argv[])
 		if (Counter::IsThread(arg->ResultVersion()) == true) {
 			Counter::VersionScoreThreaded = arg->ResultVersionScoreThreaded();
 
-			// отображаем раньше потока(Counter::ctor), чтобы запись не появилась в середине отладочного вывода
+			// РѕС‚РѕР±СЂР°Р¶Р°РµРј СЂР°РЅСЊС€Рµ РїРѕС‚РѕРєР°(Counter::ctor), С‡С‚РѕР±С‹ Р·Р°РїРёСЃСЊ РЅРµ РїРѕСЏРІРёР»Р°СЃСЊ РІ СЃРµСЂРµРґРёРЅРµ РѕС‚Р»Р°РґРѕС‡РЅРѕРіРѕ РІС‹РІРѕРґР°
 			std::cout << "\nPress any key to exit...\n";
 
 			counter = std::unique_ptr<Counter> (new Counter(arg->ResultVersion(), arg->ResultPositon(), arg->ResultLimit()));
@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 		}
 
 		if (Counter::IsThread(arg->ResultVersion()) == false)
-			// для этой версии приглашение еще не отображается
+			// РґР»СЏ СЌС‚РѕР№ РІРµСЂСЃРёРё РїСЂРёРіР»Р°С€РµРЅРёРµ РµС‰Рµ РЅРµ РѕС‚РѕР±СЂР°Р¶Р°РµС‚СЃСЏ
 			std::cout << "\nPress any key to exit...\n";
 		else
 			;

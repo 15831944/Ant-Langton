@@ -1,11 +1,11 @@
-#include "stdafx.h"
+п»ї#include "stdafx.h"
 #include <iostream>
 #include <string.h>
 #include "Arg.h"
 
 #include "Position.h"
 
-/* Конструктор - по умолчанию */
+/* РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ - РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ */
 Arg::Arg()
 {
 	_default = true;
@@ -14,8 +14,8 @@ Arg::Arg()
 	_position = 0x0;
 }
 
-/* Конструктор со значением для разбора
-* value - значение для разбора
+/* РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ СЃРѕ Р·РЅР°С‡РµРЅРёРµРј РґР»СЏ СЂР°Р·Р±РѕСЂР°
+* value - Р·РЅР°С‡РµРЅРёРµ РґР»СЏ СЂР°Р·Р±РѕСЂР°
 */
 Arg::Arg(char *value)
 	: Arg()
@@ -31,11 +31,11 @@ Arg::Arg(char *value)
 		value;
 
 	if (std::strlen(value) > 4) {
-		// разделитель версии и остальных настроек
+		// СЂР°Р·РґРµР»РёС‚РµР»СЊ РІРµСЂСЃРёРё Рё РѕСЃС‚Р°Р»СЊРЅС‹С… РЅР°СЃС‚СЂРѕРµРє
 		std::strtok(part, ";");
 		if (strlen(part) > 0) {
 			//std::cout << "\Version:" + std::string(part) + "\n";
-			// TODO: проверить на возможность преобразования
+			// TODO: РїСЂРѕРІРµСЂРёС‚СЊ РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 			try {
 				_version = static_cast<Version>(std::stoi(part));
 			} catch (std::exception e) {
@@ -43,11 +43,11 @@ Arg::Arg(char *value)
 			}
 			cc_value.erase(0, strlen(part) + 1);
 			part = (char *)cc_value.c_str();
-			// разделитель позиции X и Y
+			// СЂР°Р·РґРµР»РёС‚РµР»СЊ РїРѕР·РёС†РёРё X Рё Y
 			std::strtok(part, ","); 
 			if (strlen(part) > 0) {
 				//std::cout << "\nPositionX:" + std::string(part) + "\n";
-				// TODO: проверить на возможность преобразования
+				// TODO: РїСЂРѕРІРµСЂРёС‚СЊ РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 				try {
 					X = std::stoi(part);
 				} catch (std::exception e) {
@@ -57,10 +57,10 @@ Arg::Arg(char *value)
 				part = (char *)cc_value.c_str();
 
 				if (strlen(part) > 0) {
-					// разделитель для позиции и ограничения
+					// СЂР°Р·РґРµР»РёС‚РµР»СЊ РґР»СЏ РїРѕР·РёС†РёРё Рё РѕРіСЂР°РЅРёС‡РµРЅРёСЏ
 					std::strtok(part, ";");
 					//std::cout << "\nPositionY:" + std::string(part) + "\n";
-					// TODO: проверить на возможность преобразования
+					// TODO: РїСЂРѕРІРµСЂРёС‚СЊ РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 					try {
 						Y = std::stoi(part);
 					} catch (std::exception e) {
@@ -68,11 +68,11 @@ Arg::Arg(char *value)
 					}
 					cc_value.erase(0, strlen(part) + 1);
 					part = (char *)cc_value.c_str();
-					// ограничение
+					// РѕРіСЂР°РЅРёС‡РµРЅРёРµ
 					if (strlen(part) > 0) {
 						std::strtok(part, ";");
 						//std::cout << "\nLimit:" + std::string(part) + "\n";
-						// TODO: проверить на возможность преобразования
+						// TODO: РїСЂРѕРІРµСЂРёС‚СЊ РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 						try {
 							_limit = std::stoi(part);
 
@@ -84,11 +84,11 @@ Arg::Arg(char *value)
 
 						cc_value.erase(0, strlen(part) + 1);
 						part = (char *)cc_value.c_str();
-						// разделитель для отладочных сообщений успеха
+						// СЂР°Р·РґРµР»РёС‚РµР»СЊ РґР»СЏ РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№ СѓСЃРїРµС…Р°
 						if (strlen(part) > 0) {
 							std::strtok(part, ";");
 							//std::cout << "\nSuccesPrinted:" + std::string(part) + "\n";
-							// TODO: проверить на возможность преобразования
+							// TODO: РїСЂРѕРІРµСЂРёС‚СЊ РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 							try {
 								_successPrinted = std::stoi(part);
 							}
@@ -98,11 +98,11 @@ Arg::Arg(char *value)
 							
 							cc_value.erase(0, strlen(part) + 1);
 							part = (char *)cc_value.c_str();
-							// разделитель для отладочных сообщений ошибок
+							// СЂР°Р·РґРµР»РёС‚РµР»СЊ РґР»СЏ РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№ РѕС€РёР±РѕРє
 							if (strlen(part) > 0) {
 								std::strtok(part, ";");
 								//std::cout << "\nFailPrinted:" + std::string(part) + "\n";
-								// TODO: проверить на возможность преобразования
+								// TODO: РїСЂРѕРІРµСЂРёС‚СЊ РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 								try {
 									_failPrinted = std::stoi(part);
 								}
@@ -112,12 +112,12 @@ Arg::Arg(char *value)
 								
 								cc_value.erase(0, strlen(part) + 1);
 								part = (char *)cc_value.c_str();
-								// разделитель для отладочных сообщений ошибок
+								// СЂР°Р·РґРµР»РёС‚РµР»СЊ РґР»СЏ РѕС‚Р»Р°РґРѕС‡РЅС‹С… СЃРѕРѕР±С‰РµРЅРёР№ РѕС€РёР±РѕРє
 								if (strlen(part) == 1) {
-									// обработан крайний элемент ком./строки
+									// РѕР±СЂР°Р±РѕС‚Р°РЅ РєСЂР°Р№РЅРёР№ СЌР»РµРјРµРЅС‚ РєРѕРј./СЃС‚СЂРѕРєРё
 									//std::strtok(part, ";");
 									//std::cout << "\nVersionScoreThreaded:" + std::string(part) + "\n";
-									// TODO: проверить на возможность преобразования
+									// TODO: РїСЂРѕРІРµСЂРёС‚СЊ РЅР° РІРѕР·РјРѕР¶РЅРѕСЃС‚СЊ РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёСЏ
 									try {
 										_versionScoreThreaded = std::stoi(part);
 									}
@@ -125,7 +125,7 @@ Arg::Arg(char *value)
 										throwed(std::strcat("VersionScoreThreaded parse: ", part));
 									}
 									
-									// обработан крайний элемент ком./строки
+									// РѕР±СЂР°Р±РѕС‚Р°РЅ РєСЂР°Р№РЅРёР№ СЌР»РµРјРµРЅС‚ РєРѕРј./СЃС‚СЂРѕРєРё
 									//cc_value.erase(0, strlen(part) + 1);
 									//part = (char *)cc_value.c_str();
 								} else
@@ -154,7 +154,7 @@ Arg::Arg(const Version &ver, const int &xx, const int &yy, const int &limit)
 	_position = new Position(xx, yy);
 }
 
-/* Деструктор */
+/* Р”РµСЃС‚СЂСѓРєС‚РѕСЂ */
 Arg::~Arg()
 {
 	if (!(_position == 0x0))
@@ -165,8 +165,8 @@ Arg::~Arg()
 
 std::string Arg::Print() { return _position->Print() + ";\nLimit = " + SSTR(_limit); }
 
-/* Прервать выполнение при ошибке
- * value - значение, которое не удалось распознать
+/* РџСЂРµСЂРІР°С‚СЊ РІС‹РїРѕР»РЅРµРЅРёРµ РїСЂРё РѕС€РёР±РєРµ
+ * value - Р·РЅР°С‡РµРЅРёРµ, РєРѕС‚РѕСЂРѕРµ РЅРµ СѓРґР°Р»РѕСЃСЊ СЂР°СЃРїРѕР·РЅР°С‚СЊ
 */
 void Arg::throwed(const char *value)
 {

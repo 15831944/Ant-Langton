@@ -1,4 +1,4 @@
-#include "stdafx.h"
+п»ї#include "stdafx.h"
 // #include <stdlib.h>
 // #include <vector>
 // #include <set>
@@ -8,11 +8,11 @@
 
 #include "Counter.h"
 
-/* Признак вывода на отображение результатов успешных проверок */
+/* РџСЂРёР·РЅР°Рє РІС‹РІРѕРґР° РЅР° РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ СѓСЃРїРµС€РЅС‹С… РїСЂРѕРІРµСЂРѕРє */
 bool Counter::SuccessPrinted = true;
-/* Признак вывода на отображение результатов неудачных проверок */
+/* РџСЂРёР·РЅР°Рє РІС‹РІРѕРґР° РЅР° РѕС‚РѕР±СЂР°Р¶РµРЅРёРµ СЂРµР·СѓР»СЊС‚Р°С‚РѕРІ РЅРµСѓРґР°С‡РЅС‹С… РїСЂРѕРІРµСЂРѕРє */
 bool Counter::FailPrinted = false;
-/* Признак распараллеливания потока в режиме SCORE(22) */
+/* РџСЂРёР·РЅР°Рє СЂР°СЃРїР°СЂР°Р»Р»РµР»РёРІР°РЅРёСЏ РїРѕС‚РѕРєР° РІ СЂРµР¶РёРјРµ SCORE(22) */
 bool Counter::VersionScoreThreaded = false;
 
 bool static operator<(const std::auto_ptr<Position> &pos1, const std::auto_ptr<Position> &pos2)
@@ -20,14 +20,14 @@ bool static operator<(const std::auto_ptr<Position> &pos1, const std::auto_ptr<P
 	return (*pos1) < (*pos2);
 }
 
-/* Конструктор - по умолчанию */
+/* РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ - РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ */
 Counter::Counter()
 {
 	_curIndex = 0;
 }
 
-/* Конструктор - с аргументом (для версии Arg::CROSS, без потока)
- * - arrayPos - массив реперных точек
+/* РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ - СЃ Р°СЂРіСѓРјРµРЅС‚РѕРј (РґР»СЏ РІРµСЂСЃРёРё Arg::CROSS, Р±РµР· РїРѕС‚РѕРєР°)
+ * - arrayPos - РјР°СЃСЃРёРІ СЂРµРїРµСЂРЅС‹С… С‚РѕС‡РµРє
 */
 Counter::Counter(Position arrayPos [])
 	: Counter()
@@ -104,15 +104,15 @@ Counter::Counter(Position arrayPos [])
 	setCross.insert(Position(crossMaxX, crossMaxY));
 }
 
-/* Конструктор - с аргументами (для версий Arg::FINDING, Arg::SCORE , с потоком)
- * - версия алг.
- * - начальная позиция объекта
- * - ограничение по сумме
+/* РљРѕРЅСЃС‚СЂСѓРєС‚РѕСЂ - СЃ Р°СЂРіСѓРјРµРЅС‚Р°РјРё (РґР»СЏ РІРµСЂСЃРёР№ Arg::FINDING, Arg::SCORE , СЃ РїРѕС‚РѕРєРѕРј)
+ * - РІРµСЂСЃРёСЏ Р°Р»Рі.
+ * - РЅР°С‡Р°Р»СЊРЅР°СЏ РїРѕР·РёС†РёСЏ РѕР±СЉРµРєС‚Р°
+ * - РѕРіСЂР°РЅРёС‡РµРЅРёРµ РїРѕ СЃСѓРјРјРµ
 */
 Counter::Counter(const Arg::Version &ver, const Position &pos, const int &limit)
 	: Counter()
 {
-	// TODO: требуется проверка на вполнение условий ограничения, иначе трудности, т.к. все построено на '_setBusy.begin()'
+	// TODO: С‚СЂРµР±СѓРµС‚СЃСЏ РїСЂРѕРІРµСЂРєР° РЅР° РІРїРѕР»РЅРµРЅРёРµ СѓСЃР»РѕРІРёР№ РѕРіСЂР°РЅРёС‡РµРЅРёСЏ, РёРЅР°С‡Рµ С‚СЂСѓРґРЅРѕСЃС‚Рё, С‚.Рє. РІСЃРµ РїРѕСЃС‚СЂРѕРµРЅРѕ РЅР° '_setBusy.begin()'
 	_setBusy.insert(std::auto_ptr<Position>(new Position (pos)));
 
 	switch (ver) {
@@ -134,12 +134,12 @@ Counter::Counter(const Arg::Version &ver, const Position &pos, const int &limit)
 	}
 }
 
-/* Протестировать выполнение условий для точки
- * - ограничение
+/* РџСЂРѕС‚РµСЃС‚РёСЂРѕРІР°С‚СЊ РІС‹РїРѕР»РЅРµРЅРёРµ СѓСЃР»РѕРІРёР№ РґР»СЏ С‚РѕС‡РєРё
+ * - РѕРіСЂР°РЅРёС‡РµРЅРёРµ
 */
 void Counter::test(const int &limit)
 {
-	// тестируемая позиция точки
+	// С‚РµСЃС‚РёСЂСѓРµРјР°СЏ РїРѕР·РёС†РёСЏ С‚РѕС‡РєРё
 	Position curPosition = *(*_setBusy.begin());
 
 	std::cout << "\nTest to:\n" + curPosition.Print();
@@ -153,10 +153,10 @@ void Counter::test(const int &limit)
 	}
 }
 
-/* Возвратить признак успеха/ошибки проверки выполнения условий ограничений
- * pos - позиция ячейки для проверки
- * limit - ограничение суммы
- * - признак необходимости проверять наличие в итоговом контейнере (точки, прошедшие проверку на выполнение условий ограничений)
+/* Р’РѕР·РІСЂР°С‚РёС‚СЊ РїСЂРёР·РЅР°Рє СѓСЃРїРµС…Р°/РѕС€РёР±РєРё РїСЂРѕРІРµСЂРєРё РІС‹РїРѕР»РЅРµРЅРёСЏ СѓСЃР»РѕРІРёР№ РѕРіСЂР°РЅРёС‡РµРЅРёР№
+ * pos - РїРѕР·РёС†РёСЏ СЏС‡РµР№РєРё РґР»СЏ РїСЂРѕРІРµСЂРєРё
+ * limit - РѕРіСЂР°РЅРёС‡РµРЅРёРµ СЃСѓРјРјС‹
+ * - РїСЂРёР·РЅР°Рє РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё РїСЂРѕРІРµСЂСЏС‚СЊ РЅР°Р»РёС‡РёРµ РІ РёС‚РѕРіРѕРІРѕРј РєРѕРЅС‚РµР№РЅРµСЂРµ (С‚РѕС‡РєРё, РїСЂРѕС€РµРґС€РёРµ РїСЂРѕРІРµСЂРєСѓ РЅР° РІС‹РїРѕР»РЅРµРЅРёРµ СѓСЃР»РѕРІРёР№ РѕРіСЂР°РЅРёС‡РµРЅРёР№)
 */
 bool Counter::isSuccess(Position &pos, const int &limit, bool bContains) const
 {
@@ -167,7 +167,7 @@ bool Counter::isSuccess(Position &pos, const int &limit, bool bContains) const
 			);
 }
 
-/* Возвратить следующее направление движения объекта */
+/* Р’РѕР·РІСЂР°С‚РёС‚СЊ СЃР»РµРґСѓСЋС‰РµРµ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ РѕР±СЉРµРєС‚Р° */
 Position::Direct Counter::nextDirect()
 {
 	if ((_curIndex + 1) < _vecPossible.size())
@@ -197,7 +197,7 @@ bool Counter::isUniquePosition(const Position &pos)
 	return iter == _setBusy.end();
 }
 
-/* Деструктор */
+/* Р”РµСЃС‚СЂСѓРєС‚РѕСЂ */
 Counter::~Counter()
 {
 	try {
@@ -210,16 +210,16 @@ Counter::~Counter()
 	}
 }
 
-/* Потоковая функция 1-ой версии алгоритма подсчета точек-ячеек
- * limit - ограничение суммы
+/* РџРѕС‚РѕРєРѕРІР°СЏ С„СѓРЅРєС†РёСЏ 1-РѕР№ РІРµСЂСЃРёРё Р°Р»РіРѕСЂРёС‚РјР° РїРѕРґСЃС‡РµС‚Р° С‚РѕС‡РµРє-СЏС‡РµРµРє
+ * limit - РѕРіСЂР°РЅРёС‡РµРЅРёРµ СЃСѓРјРјС‹
 */
 void Counter::threadCounter1(const int &limit)
 {
-	// текущее направление движения точки
+	// С‚РµРєСѓС‰РµРµ РЅР°РїСЂР°РІР»РµРЅРёРµ РґРІРёР¶РµРЅРёСЏ С‚РѕС‡РєРё
 	Position::Direct curDirect = _vecPossible[0];
-	// текущая позиция точки
+	// С‚РµРєСѓС‰Р°СЏ РїРѕР·РёС†РёСЏ С‚РѕС‡РєРё
 	Position curPosition = *(*_setBusy.begin());
-	// итератор для поиска одной из уже возможно добавленных точек
+	// РёС‚РµСЂР°С‚РѕСЂ РґР»СЏ РїРѕРёСЃРєР° РѕРґРЅРѕР№ РёР· СѓР¶Рµ РІРѕР·РјРѕР¶РЅРѕ РґРѕР±Р°РІР»РµРЅРЅС‹С… С‚РѕС‡РµРє
 	std::set<std::auto_ptr<Position>>::iterator iterFind = _setBusy.end();
 
 	do {
@@ -232,7 +232,7 @@ void Counter::threadCounter1(const int &limit)
 				std::cout << "\nOk\n";
 			} else {
 				curPosition.Return();
-				// TODO: повторный код
+				// TODO: РїРѕРІС‚РѕСЂРЅС‹Р№ РєРѕРґ
 				iterFind = _setBusy.find(std::auto_ptr<Position>(new Position(curPosition)));
 				if (!(iterFind == _setBusy.end()))
 					(*iterFind)->Fail(curDirect);
@@ -243,8 +243,8 @@ void Counter::threadCounter1(const int &limit)
 
 				std::vector<Position::Direct>::const_iterator iterPossible = _vecPossible.begin();
 				while (!(iterPossible == _vecPossible.end())) {
-					if ((!(curDirect == *iterPossible)) // 'curDirect' - уже привело к 'Fail'
-						&& (curPosition.IsFail(*iterPossible) == false)) { // проверить о таком направлении в прошлом
+					if ((!(curDirect == *iterPossible)) // 'curDirect' - СѓР¶Рµ РїСЂРёРІРµР»Рѕ Рє 'Fail'
+						&& (curPosition.IsFail(*iterPossible) == false)) { // РїСЂРѕРІРµСЂРёС‚СЊ Рѕ С‚Р°РєРѕРј РЅР°РїСЂР°РІР»РµРЅРёРё РІ РїСЂРѕС€Р»РѕРј
 						curPosition.Next(*iterPossible);
 						std::cout << "Play to:" + SSTR(*iterPossible) + "\n" + curPosition.Print();
 
@@ -255,7 +255,7 @@ void Counter::threadCounter1(const int &limit)
 							break;
 						} else {
 							std::auto_ptr<Position> (new Position(curPosition))->Return();
-							// TODO: повторный код
+							// TODO: РїРѕРІС‚РѕСЂРЅС‹Р№ РєРѕРґ
 							iterFind = _setBusy.find(std::auto_ptr<Position>(new Position(curPosition)));
 							if (!(iterFind == _setBusy.end()))
 								(*iterFind)->Fail(*iterPossible);
@@ -271,7 +271,7 @@ void Counter::threadCounter1(const int &limit)
 				}
 
 				if ((iterPossible == _vecPossible.end())
-					&& (!(curPosition == *(*_setBusy.cbegin())))) // возвращаться из исходной точки нельзя
+					&& (!(curPosition == *(*_setBusy.cbegin())))) // РІРѕР·РІСЂР°С‰Р°С‚СЊСЃСЏ РёР· РёСЃС…РѕРґРЅРѕР№ С‚РѕС‡РєРё РЅРµР»СЊР·СЏ
 					curPosition.Return();
 				else
 					;
@@ -289,8 +289,8 @@ void Counter::threadCounter1(const int &limit)
 	std::cout << "\nCounter::thread(ver.1) stopped...";
 }
 
-/* Потоковая функция 2-ой версии алгоритма подсчета точек-ячеек
- * limit - ограничение суммы
+/* РџРѕС‚РѕРєРѕРІР°СЏ С„СѓРЅРєС†РёСЏ 2-РѕР№ РІРµСЂСЃРёРё Р°Р»РіРѕСЂРёС‚РјР° РїРѕРґСЃС‡РµС‚Р° С‚РѕС‡РµРє-СЏС‡РµРµРє
+ * limit - РѕРіСЂР°РЅРёС‡РµРЅРёРµ СЃСѓРјРјС‹
 */
 void Counter::threadCounter2(const int &limit)
 {
@@ -320,8 +320,8 @@ int Counter::maxPassed(const int &radius) const
 	return iRes;
 }
 
-/* Потоковая функция 2-ой версии (внутренняя) алгоритма подсчета точек-ячеек
-* limit - ограничение суммы
+/* РџРѕС‚РѕРєРѕРІР°СЏ С„СѓРЅРєС†РёСЏ 2-РѕР№ РІРµСЂСЃРёРё (РІРЅСѓС‚СЂРµРЅРЅСЏСЏ) Р°Р»РіРѕСЂРёС‚РјР° РїРѕРґСЃС‡РµС‚Р° С‚РѕС‡РµРє-СЏС‡РµРµРє
+* limit - РѕРіСЂР°РЅРёС‡РµРЅРёРµ СЃСѓРјРјС‹
 */
 void Counter::threadCounter22(const int & radius, const int &limit)
 {
@@ -339,16 +339,16 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 	markPosition = *(*_setBusy.begin());
 	_mtx22.unlock();
 
-	// выход на исходную для обхода точку (из центра - вверх)
+	// РІС‹С…РѕРґ РЅР° РёСЃС…РѕРґРЅСѓСЋ РґР»СЏ РѕР±С…РѕРґР° С‚РѕС‡РєСѓ (РёР· С†РµРЅС‚СЂР° - РІРІРµСЂС…)
 	do {
 		markPosition.Next(Position::Direct::UP_LEFT);
 	} while (markPosition.Difference(centrePosition, curDirect) < radius);
-	// присваиеваем текущей точке для выполнения движения
+	// РїСЂРёСЃРІР°РёРµРІР°РµРј С‚РµРєСѓС‰РµР№ С‚РѕС‡РєРµ РґР»СЏ РІС‹РїРѕР»РЅРµРЅРёСЏ РґРІРёР¶РµРЅРёСЏ
 	curPosition = Position(markPosition);
 
 	try {
 		do {
-			// в 1-ый проход будет установлен RIGHT(2)
+			// РІ 1-С‹Р№ РїСЂРѕС…РѕРґ Р±СѓРґРµС‚ СѓСЃС‚Р°РЅРѕРІР»РµРЅ RIGHT(2)
 			curDirect = nextDirect();
 
 			do {
@@ -409,7 +409,7 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 	}
 }
 
-/* Остановить поток */
+/* РћСЃС‚Р°РЅРѕРІРёС‚СЊ РїРѕС‚РѕРє */
 void Counter::Stop()
 {
 	try {
