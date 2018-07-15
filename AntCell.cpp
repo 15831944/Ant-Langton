@@ -32,6 +32,7 @@ int main(int argc, char* argv[])
 		Counter::FailPrinted = arg->ResultFailPrinted();
 
 		if (Counter::IsThread(arg->ResultVersion()) == true) {
+			// для режима 'FINDING' не применяется
 			Counter::VersionScoreThreaded = arg->ResultVersionScoreThreaded();
 
 			// отображаем раньше потока(Counter::ctor), чтобы запись не появилась в середине отладочного вывода
