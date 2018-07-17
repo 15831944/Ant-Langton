@@ -2,6 +2,8 @@
 
 // #include <stdlib.h>
 #include <deque>
+#include <tuple>
+#include <vector>
 #include <set>
 
 #include "coord.h"
@@ -24,15 +26,10 @@ public:
 		, MAX
 	};
 
+	const std::vector<Direct> VectorDirectPossible = { UP, RIGHT, DOWN, LEFT };
+
 /* Memmbers */
 private:
-	///* Исходные координаты (до вызова метода 'Play') */
-	//Coord __previousX, __previousY
-	//	, _previousX, _previousY;
-
-	std::deque<Direct> _path;
-
-	std::set<Direct> _setFail;
 
 	int _summa;
 	/* Прервать выполнение при ошибке
@@ -61,7 +58,11 @@ public:
 
 	Position(const Position & );
 
+	Position(const Position & , const Direct& );
+
 	Position(const Position *);
+
+	Position(const Position *, const Direct&);
 	/* Конструктор
 	 * - координата 'X'
 	 * - координата 'Y'
@@ -85,13 +86,16 @@ public:
 	 * - направление
 	 * - признак реверсивности (не используется)
 	*/
-	void Next(const Direct &, bool = false) ;
+	void Move(const Direct &, bool = false) ;
 
 	/* Установить значения координат предыдущей точки для текущего объекта */
-	void Return();
+	void Return(const Direct & );
+
+	/* Возвратить следующую точку */
+	Position &Next(const Direct & ) const;
 
 	/* Возвратить предыдущую точку */
-	Position &Previous() const;
+	Position &Previous(const Direct & ) const;
 
 	/* Установить признак нневозможности пердвигаиться из точки по направлению
 	 * - направление

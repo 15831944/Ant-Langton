@@ -110,6 +110,16 @@ std::string Coord::Print()
 	return strRes;
 }
 
+Coord &Coord::Next() const
+{
+	return *new Coord(_value + 1);
+}
+
+Coord &Coord::Return() const
+{
+	return *new Coord(_value - 1);
+}
+
 /* Прервать выполнение при ошибке
  * order - позиция элемента при обработке которого произошла ошибка
 */

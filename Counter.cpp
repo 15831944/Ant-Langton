@@ -160,10 +160,15 @@ void Counter::test(const int &limit)
 */
 bool Counter::isSuccess(Position &pos, const int &limit, bool bContains) const
 {
-	return !((pos.Summa() > limit))
+	std::set<std::auto_ptr<Position>>::iterator setBusyEnd = _setBusy.end();
+
+	return !(pos.Summa() > limit)
 		&& ((bContains == false)
-			|| (_setBusy.find(std::auto_ptr<Position> (new Position (pos))) == _setBusy.end())
-			//isUniquePosition(curPosition) == true
+			|| ((_setBusy.find(std::auto_ptr<Position>(new Position(pos))) == setBusyEnd)
+				&& ((!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::UP))) == setBusyEnd))
+					|| (!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::RIGHT))) == setBusyEnd))
+					|| (!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::DOWN))) == setBusyEnd))
+					|| (!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::LEFT))) == setBusyEnd))))
 			);
 }
 
@@ -350,7 +355,7 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 
 	// выход на исходную для обхода точку (из центра - вверх)
 	do {
-		markPosition.Next(Position::Direct::UP_LEFT);
+		markPosition.Move(Position::Direct::UP_LEFT);
 	} while (markPosition.Difference(centrePosition, curDirect) < radius);
 	// присваиеваем текущей точке для выполнения движения
 	curPosition = Position(markPosition);
@@ -361,7 +366,7 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 			curDirect = nextDirect();
 
 			do {
-				curPosition.Next(curDirect);
+				curPosition.Move(curDirect);
 			
 				_mtx22.lock();
 

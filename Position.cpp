@@ -30,8 +30,19 @@ Position::Position(const Position &pos)
 	_setFail = pos._setFail;
 }
 
+Position::Position(const Position &pos, const Direct &direct)
+	: Position (pos)
+{
+	Move(direct);
+}
+
 Position::Position(const Position *pos)
 	: Position(*pos)
+{
+}
+
+Position::Position(const Position *pos, const Direct &direct)
+	: Position (*pos, direct)
 {
 }
 
@@ -79,7 +90,7 @@ void Position::Play(const Direct &direct, const int &limit)
 	while (Summa() < limit) {
 		xx = X; yy = Y;
 
-		Next(direct);
+		Move(direct);
 	}
 	// возвратить крайние значения, удовлетворяющие условию ограничения
 	X = xx; Y = yy;
@@ -91,18 +102,12 @@ void Position::Play(const Direct &direct, const int &limit)
  * - direct - направление
  * - bReverse - признак реверсивности (не используется)
 */
-void Position::Next(const Direct &direct, bool bReverse)
+void Position::Move(const Direct &direct, bool bReverse)
 {
 	// TODO: 'var' не учитывается? Иначе сложности с операторами 'Coord::+=', 'Coord::-='
 	int var = 1;
 
-	/*__previousX = _previousX;
-	__previousY = _previousY;
-
-	_previousX = X;
-	_previousY = Y;*/
-
-	_path.push_back(direct);
+	_path.push_back(std::make_tuple (direct, std::set<Direct> { } ));
 
 	switch (direct) {
 		case Direct::UP:
@@ -138,57 +143,99 @@ void Position::Next(const Direct &direct, bool bReverse)
 }
 
 /* Установить значения координат предыдущей точки для текущего объекта */
-void Position::Return()
+void Position::Return(const Direct &direct)
 {
-	Direct direct;
-
-	if (_path.size() > 0) {
-		direct = _path.back();
-		_path.pop_back();
-
-		switch (direct) {
-			case Direct::UP:
-				Y --;
-				break;
-			case Direct::UP_RIGHT:
-				X --; Y --;
-				break;
-			case Direct::RIGHT:
-				X --;
-				break;
-			case Direct::DOWN_RIGHT:
-				X --; Y ++;
-				break;
-			case Direct::DOWN:
-				Y ++;
-				break;
-			case Direct::DOWN_LEFT:
-				X ++; Y ++;
-				break;
-			case Direct::LEFT:
-				X ++;
-				break;
-			case Direct::UP_LEFT:
-				X ++; Y --;
-				break;
-			default:
-				throwed(direct);
-				break;
-		}
-
-		_summa = summa();
+	switch (direct) {
+		case Direct::UP:
+			Y --;
+			break;
+		case Direct::UP_RIGHT:
+			X --; Y --;
+			break;
+		case Direct::RIGHT:
+			X --;
+			break;
+		case Direct::DOWN_RIGHT:
+			X --; Y ++;
+			break;
+		case Direct::DOWN:
+			Y ++;
+			break;
+		case Direct::DOWN_LEFT:
+			X ++; Y ++;
+			break;
+		case Direct::LEFT:
+			X ++;
+			break;
+		case Direct::UP_LEFT:
+			X ++; Y --;
+			break;
+		default:
+			throwed(direct);
+			break;
 	}
-	else
-		throwed(Direct::MAX);
+
+	_summa = summa();
+}
+
+/* Возвратить следующую точку */
+Position &Position::Next(const Direct &direct) const
+{
+	Coord x = X
+		, y = Y;
+
+	switch (direct)
+	{
+		case UP:
+			y = Y.Next();
+			break;
+		case RIGHT:
+			x = X.Next();
+			break;
+		case DOWN:
+			y = Y.Return();
+			break;
+		case LEFT:
+			x = X.Return();
+			break;
+		default:
+			break;
+	}
+
+	return *new Position(x, y);
 }
 
 /* Возвратить предыдущую точку */
 Position &Position::Previous() const
 {
-	Position *posRes = new Position(*this);
-	posRes->Return();
+	Coord x = X
+		, y = Y;
+	State state;
 
-	return *posRes;
+	if (_path.empty() == false) {
+		state = _path.back();
+
+		switch (std::get<0>(state))
+		{
+		case UP:
+			y = Y.Next();
+			break;
+		case RIGHT:
+			x = X.Next();
+			break;
+		case DOWN:
+			y = Y.Return();
+			break;
+		case LEFT:
+			x = X.Return();
+			break;
+		default:
+			break;
+		}
+	} else {
+	}
+
+	return *new Position(x, y);
 }
 
 /* Установить признак нневозможности пердвигаиться из точки по направлению
@@ -196,6 +243,7 @@ Position &Position::Previous() const
 */
 void Position::Fail(const Position::Direct &direct)
 {
+	std::tuple<>
 	_setFail.insert(direct);
 }
 
