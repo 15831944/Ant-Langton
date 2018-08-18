@@ -1,11 +1,17 @@
-#pragma once
-#include "Position.h"
-class Track :
-	public Position, std::deque<std::tuple<Position::Direct, std::set<Position::Direct>>>
+﻿#pragma once
+
+#include <set>
+#include "TrackItem.h"
+
+struct Track :
+	public std::set<TrackItem>
 {
 public:
+
 	Track();
 
 	virtual ~Track();
+
+	Position &Return(const Position &) const;
 };
 

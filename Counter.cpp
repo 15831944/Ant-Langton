@@ -3,7 +3,7 @@
 // #include <vector>
 // #include <set>
 #include <iostream>
-// #include <deque>
+#include <deque>
 // #include <algorithm>
 
 #include "Counter.h"
@@ -113,7 +113,7 @@ Counter::Counter(const Arg::Version &ver, const Position &pos, const int &limit)
 	: Counter()
 {
 	// TODO: требуется проверка на вполнение условий ограничения, иначе трудности, т.к. все построено на '_setBusy.begin()'
-	_setBusy.insert(std::auto_ptr<Position>(new Position (pos)));
+	_track.insert(TrackItem(Position(pos), Position::Direct::UNKNOWN));
 
 	switch (ver) {
 		case Arg::Version::FINDING:
@@ -140,12 +140,12 @@ Counter::Counter(const Arg::Version &ver, const Position &pos, const int &limit)
 void Counter::test(const int &limit)
 {
 	// тестируемая позиция точки
-	Position curPosition = *(*_setBusy.begin());
+	Position curPosition = (*_track.begin())._position;
 
 	std::cout << "\nTest to:\n" + curPosition.Print();
 
 	if (isSuccess(curPosition, limit, false) == true) {
-		_setBusy.insert(std::auto_ptr<Position>(new Position(curPosition)));
+		_track.insert(TrackItem(Position(curPosition), Position::Direct::UNKNOWN));
 		std::cout << "\nOk\n";
 	}
 	else {
@@ -160,15 +160,30 @@ void Counter::test(const int &limit)
 */
 bool Counter::isSuccess(Position &pos, const int &limit, bool bContains) const
 {
-	std::set<std::auto_ptr<Position>>::iterator setBusyEnd = _setBusy.end();
+	Track::iterator setTrackEnd = _track.end();
+
+	std::function<bool()> validateVectorPossible = [this, &pos, &setTrackEnd]() -> bool {
+		bool bRes = false;
+		std::vector<Position::Direct>::const_iterator iterVecPossible;
+
+		iterVecPossible = _vecPossible.begin();
+		while ((!(iterVecPossible == _vecPossible.end()))
+			&& (bRes == false)) {
+			if (!(_track.find(TrackItem(Position(pos).Return(*iterVecPossible), *iterVecPossible)) == setTrackEnd))
+				bRes = true;
+			else
+				;
+
+			iterVecPossible++;
+		}
+
+		return bRes;
+	};
 
 	return !(pos.Summa() > limit)
 		&& ((bContains == false)
-			|| ((_setBusy.find(std::auto_ptr<Position>(new Position(pos))) == setBusyEnd)
-				&& ((!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::UP))) == setBusyEnd))
-					|| (!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::RIGHT))) == setBusyEnd))
-					|| (!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::DOWN))) == setBusyEnd))
-					|| (!(_setBusy.find(std::auto_ptr<Position>(new Position(pos, Position::Direct::LEFT))) == setBusyEnd))))
+			|| ((_track.find(TrackItem(new Position(pos), Position::Direct::UNKNOWN)) == setTrackEnd)
+				&& (validateVectorPossible() == true))
 			);
 }
 
@@ -187,19 +202,19 @@ bool Counter::isUniquePosition(const Position &pos)
 {
 	bool bRes = true;
 
-	std::set<std::auto_ptr<Position>>::iterator iter = _setBusy.begin();
+	Track::iterator iterTrackItem = _track.begin();
 
-	while (!(iter == _setBusy.end())) {
-		if (((*iter)->X.Value() == pos.X.Value())
-			&& ((*iter)->Y.Value() == pos.Y.Value()))
+	while (!(iterTrackItem == _track.end())) {
+		if (((*iterTrackItem)._position.X.Value() == pos.X.Value())
+			&& ((*iterTrackItem)._position.Y.Value() == pos.Y.Value()))
 			break;
 		else
 			;
 
-		iter++;
+		iterTrackItem++;
 	}
 
-	return iter == _setBusy.end();
+	return iterTrackItem == _track.end();
 }
 
 /* Деструктор */
@@ -207,7 +222,7 @@ Counter::~Counter()
 {
 	try {
 		_mtx22.lock();
-		_setBusy.clear();
+		_track.clear();
 		_mtx22.unlock();
 	} catch (std::exception e) {
 		// TODO:
@@ -220,76 +235,72 @@ Counter::~Counter()
 */
 void Counter::threadCounter1(const int &limit)
 {
-	// текущее направление движения точки
-	Position::Direct curDirect = _vecPossible[0];
-	// текущая позиция точки
-	Position curPosition = *(*_setBusy.begin());
+	Position::Direct failDirect;
+	Position startPosition = (*_track.begin())._position
+		, curPosition = startPosition; // текущая позиция точки
+	TrackItem trackItem;	
+	// итератор текущего направления движения точки
+	std::vector<Position::Direct>::const_iterator iterCurDirect = _vecPossible.begin();
+	std::deque<std::vector<Position::Direct>::const_iterator> dequeNotAvaliable;
 	// итератор для поиска одной из уже возможно добавленных точек
-	std::set<std::auto_ptr<Position>>::iterator iterFind = _setBusy.end();
+	Track::const_iterator iterTrackFind;
+
+	_setPassed.clear();
+	_setPassed.insert(startPosition);
+	_track.insert(TrackItem(curPosition, Position::Direct::UNKNOWN));
 
 	do {
-		if (curPosition.IsFail(curDirect) == false) {
-			curPosition.Next(curDirect);
-			std::cout << "\nPlay to:" + SSTR(curDirect) + "\n" + curPosition.Print();
+		failDirect = Position::Direct::UNKNOWN;
+		iterTrackFind = _track.begin(); // признак отсутствия вставки
+		curPosition = curPosition.Next(*iterCurDirect);
+		_setPassed.insert(curPosition);
 
-			if (isSuccess(curPosition, limit) == true) {
-				_setBusy.insert(std::auto_ptr<Position> (new Position(curPosition)));
-				std::cout << "\nOk\n";
-			} else {
-				curPosition.Return();
-				// TODO: повторный код
-				iterFind = _setBusy.find(std::auto_ptr<Position>(new Position(curPosition)));
-				if (!(iterFind == _setBusy.end()))
-					(*iterFind)->Fail(curDirect);
-				else
-					;
-				curPosition.Fail(curDirect);
-				std::cout << "\nFail...\n";
+		if (!(curPosition.Summa() > limit)) {
+			trackItem = TrackItem(curPosition, *iterCurDirect);
+			iterTrackFind = _track.find(trackItem);
 
-				std::vector<Position::Direct>::const_iterator iterPossible = _vecPossible.begin();
-				while (!(iterPossible == _vecPossible.end())) {
-					if ((!(curDirect == *iterPossible)) // 'curDirect' - уже привело к 'Fail'
-						&& (curPosition.IsFail(*iterPossible) == false)) { // проверить о таком направлении в прошлом
-						curPosition.Next(*iterPossible);
-						std::cout << "Play to:" + SSTR(*iterPossible) + "\n" + curPosition.Print();
+			if (iterTrackFind == _track.end()) {
+				_track.insert(trackItem);
+				std::cout << "Ok: " << curPosition.Print() << std::endl;
 
-						if (isSuccess(curPosition, limit) == true) {
-							_setBusy.insert(std::auto_ptr<Position>(new Position(curPosition)));
-							std::cout << "\nOk\n";
-
-							break;
-						} else {
-							std::auto_ptr<Position> (new Position(curPosition))->Return();
-							// TODO: повторный код
-							iterFind = _setBusy.find(std::auto_ptr<Position>(new Position(curPosition)));
-							if (!(iterFind == _setBusy.end()))
-								(*iterFind)->Fail(*iterPossible);
-							else
-								;
-							curPosition.Fail(*iterPossible);
-							std::cout << "\nFail...\n";
-						}
-					} else
-						;
-
-					iterPossible++;
+				if (dequeNotAvaliable.empty() == true)
+					iterCurDirect = (iterCurDirect + 1) == _vecPossible.end() ? _vecPossible.begin() : iterCurDirect + 1;
+				else {
+					iterCurDirect = dequeNotAvaliable.back();
+					dequeNotAvaliable.pop_back();
 				}
+			} else
+				;
+		} else
+			;
+			
+		if (!(iterTrackFind == _track.end())) {
+			curPosition = curPosition.Return(*iterCurDirect);
+			iterTrackFind = _track.find(TrackItem(curPosition, Position::Direct::UNKNOWN));
+			(*iterTrackFind)._setFail.insert(*iterCurDirect);
 
-				if ((iterPossible == _vecPossible.end())
-					&& (!(curPosition == *(*_setBusy.cbegin())))) // возвращаться из исходной точки нельзя
-					curPosition.Return();
-				else
-					;
+			if ((dequeNotAvaliable.size() + 1) < _vecPossible.size()) {
+				dequeNotAvaliable.push_back(iterCurDirect);
+				iterCurDirect = iterCurDirect == _vecPossible.begin() ? std::prev(_vecPossible.end()) : iterCurDirect - 1;
+			}
+			else {
+				// TODO: разместить внутрь Track (в метод 'Return')
+				failDirect = (*iterTrackFind)._direct;
+				curPosition = _track.Return(curPosition);
+				iterTrackFind = _track.find(TrackItem(curPosition, Position::Direct::UNKNOWN));
+				(*iterTrackFind)._setFail.insert(failDirect);
+
+				dequeNotAvaliable.clear();
+				iterCurDirect = std::find(_vecPossible.begin(), _vecPossible.end(), failDirect);
+				iterCurDirect = (iterCurDirect + 1) == _vecPossible.end() ? _vecPossible.begin() : iterCurDirect + 1;
+
+				/*std::cout << "Result: <" << _setPassed.size() << ":" << _track.size() << ">" << std::endl;
+				getch();*/
 			}
 		} else
 			;
-
-		curDirect = nextDirect();
-
-		iterFind = _setBusy.find(std::auto_ptr<Position>(new Position(curPosition)));
-	} while (!(iterFind == _setBusy.begin())
-		|| ((iterFind == _setBusy.begin())
-			&& (curPosition.IsFail(_vecPossible.size()) == false)));
+	} while ((!(curPosition == startPosition))
+		|| ((curPosition == startPosition) && (dequeNotAvaliable.size() == 0) && ((*iterTrackFind)._setFail.size() < _vecPossible.size())));
 
 	std::cout << "\nCounter::thread(ver.1) stopped...";
 }
@@ -342,21 +353,21 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 		, iPass = 0
 		, maxPass = maxPassed(radius);
 	Position::Direct curDirect = _vecPossible[0];
-	Position centrePosition
+	Position startPosition
 		, curPosition
 		, markPosition;
 	std::string message;
 
 	_mtx22.lock();
-	centrePosition = *(*_setBusy.begin());
-	curPosition = *(*_setBusy.begin());
-	markPosition = *(*_setBusy.begin());
+	startPosition = (*_track.begin())._position;
+	curPosition = startPosition;
+	markPosition = startPosition;
 	_mtx22.unlock();
 
 	// выход на исходную для обхода точку (из центра - вверх)
 	do {
 		markPosition.Move(Position::Direct::UP_LEFT);
-	} while (markPosition.Difference(centrePosition, curDirect) < radius);
+	} while (markPosition.Difference(startPosition, curDirect) < radius);
 	// присваиеваем текущей точке для выполнения движения
 	curPosition = Position(markPosition);
 
@@ -370,8 +381,9 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 			
 				_mtx22.lock();
 
+				_setPassed.insert(curPosition);
 				if (isSuccess(curPosition, limit) == true) {
-					_setBusy.insert(std::auto_ptr<Position>(new Position(curPosition)));
+					_track.insert(TrackItem(Position(curPosition), Position::Direct::UNKNOWN));
 					iRes++;
 
 					if (SuccessPrinted == true)
@@ -400,7 +412,7 @@ void Counter::threadCounter22(const int & radius, const int &limit)
 					break;
 				} else
 					;
-			} while ((centrePosition.Difference(curPosition, curDirect) - radius) < 0);
+			} while ((startPosition.Difference(curPosition, curDirect) - radius) < 0);
 		} while ((!(curPosition == markPosition))
 			&& (!(iPass > maxPass)));
 	} catch (std::exception e) {

@@ -15,7 +15,8 @@ public:
 	/* Перечисление направлений перемещения */
 	enum Direct
 	{
-		UP
+		UNKNOWN = -1
+		, UP
 		, UP_RIGHT
 		, RIGHT
 		, DOWN_RIGHT
@@ -89,7 +90,7 @@ public:
 	void Move(const Direct &, bool = false) ;
 
 	/* Установить значения координат предыдущей точки для текущего объекта */
-	void Return(const Direct & );
+	Position & Return(const Direct & ) const;
 
 	/* Возвратить следующую точку */
 	Position &Next(const Direct & ) const;

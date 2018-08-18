@@ -8,6 +8,8 @@
 Coord::Coord()
 {
 	_value = 0;
+	_min = 65364;
+	_max = -65365;
 	// всем элементам значение '0'
 	initialize0();
 }
@@ -19,6 +21,16 @@ Coord::Coord(const int& value)
 	: Coord()
 {
 	_value = value;
+
+	if (_min > _value)
+		_min = value;
+	else
+		;
+
+	if (_max < _value)
+		_max = value;
+	else
+		;
 
 	initialize();
 }
@@ -88,22 +100,27 @@ int Coord::summaAt(int order)
 }
 
 /* Возвратить строку с подробным описанием значения */
-std::string Coord::Print()
+std::string Coord::Print(bool bDetail)
 {
-	std::string strRes = "Coord from <" + SSTR(_value) + ">="
+	std::string strRes = "Coord from <" + SSTR(_value) + ">"
 		, orderPass = "";
 
-	for (int order = Order::MAX - 1; !(order < Order::UNIT); order--) {
-		orderPass = "[" + SSTR(order) + ", " + SSTR(_values[order]) + "], ";
-		if (orderPass.length() < 2)
-			throwed(static_cast<Order>(order));
-		else
-			;
+	if (bDetail == true) {
+		strRes += "=";
 
-		strRes += orderPass;
-	}
-	// удалить лишние символы (для крайнего элемента)
-	strRes.resize(strRes.length() - 2);
+		for (int order = Order::MAX - 1; !(order < Order::UNIT); order--) {
+			orderPass = "[" + SSTR(order) + ", " + SSTR(_values[order]) + "], ";
+			if (orderPass.length() < 2)
+				throwed(static_cast<Order>(order));
+			else
+				;
+
+			strRes += orderPass;
+		}
+		// удалить лишние символы (для крайнего элемента)
+		strRes.resize(strRes.length() - 2);
+	} else
+		;
 
 	strRes += "; Summa=" + SSTR(Summa());
 

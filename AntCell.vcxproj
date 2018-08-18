@@ -148,6 +148,7 @@
     <ClInclude Include="..\..\..\MyProject%27s\C++\AntCell\stdafx.h" />
     <ClInclude Include="..\..\..\MyProject%27s\C++\AntCell\targetver.h" />
     <ClInclude Include="..\..\..\MyProject%27s\C++\AntCell\Track.h" />
+    <ClInclude Include="..\..\..\MyProject%27s\C++\AntCell\TrackItem.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\MyProject%27s\C++\AntCell\AntCell.cpp" />
@@ -162,6 +163,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\..\..\MyProject%27s\C++\AntCell\Track.cpp" />
+    <ClCompile Include="..\..\..\MyProject%27s\C++\AntCell\TrackItem.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

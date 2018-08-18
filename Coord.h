@@ -16,6 +16,7 @@ private:
 
 /* Members */
 private:
+	static int _min, _max;
 	/* Исходное значение */
 	int _value;
 	/* Массив значений по позициям */
@@ -56,7 +57,7 @@ public:
 	/* Возвратить сумму всех элементов значения */
 	int Summa();
 	/* Возвратить строку с подробным описанием значения */
-	std::string Print();
+	std::string Print(bool = false);
 
 	Coord &Return() const;
 
@@ -83,5 +84,9 @@ public:
 	Coord &operator-= (int);
 	/* Возвратить исходное значение */
 	inline int Value() const { return _value; }
+	/* Возвратить миню значение */
+	inline int Min() const { return _min; }
+	/* Возвратить миню значение */
+	inline int Max() const { return _max; }
 };
 

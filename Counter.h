@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "Arg.h"
+#include "Track.h"
 
 class Counter
 {
@@ -21,10 +22,12 @@ private:
 		, Position::Direct::LEFT
 	};
 
+	Track _track;
+
 	/* Текущий индекс для выбора очередного направления движения */
 	unsigned short _curIndex;
-	/* Контейнер для ячеек, удовлетвряющих условиям ограничений */
-	std::set<std::auto_ptr<Position>> _setBusy;
+	/* Контейнер для просмотренных ячеек */
+	std::set<Position> _setPassed;
 
 	/* Признак завершения алгоритма SCORE(2) */
 	int _busy;
@@ -94,8 +97,11 @@ public:
 	void threadCounter2(const int &);
 	void threadCounter22(const int & , const int &);
 
+	/* Возвратить результат просмотра */
+	inline int ResultPassed() const { return _setPassed.size(); }
+
 	/* Возвратить результат подсчета */
-	inline int Result() const { return _setBusy.size(); }
+	inline int ResultTrack() const { return _track.size(); }
 
 	inline static bool IsThread(const Arg::Version &ver)
 	{

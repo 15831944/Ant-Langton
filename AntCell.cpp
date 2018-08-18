@@ -71,7 +71,7 @@ int main(int argc, char* argv[])
 			counter->Stop();
 		else
 			;
-		std::cout << "\nResult <" + SSTR(counter->Result()) + ">...\n";
+		std::cout << "\nResult <" << SSTR(counter->ResultPassed()) << ":" << SSTR(counter->ResultTrack()) << ">...\n";
 
 		// TODO: auto_ptr<Arg>
 		if (!(arg == 0x0))
